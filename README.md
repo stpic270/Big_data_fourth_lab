@@ -1,1 +1,2 @@
-# Big_data_first_lab
+# mle-template
+Classic MLE template with CI/CD pipelines
