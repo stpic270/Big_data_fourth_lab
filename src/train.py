@@ -1,11 +1,10 @@
 import configparser
 import os
-import pandas as pd
 import pickle
+from sklearn.naive_bayes import BernoulliNB
 from sklearn.metrics import accuracy_score
-from sklearn.naive_bayes import GaussianNB
+
 from sklearn.linear_model import LogisticRegression
-from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 import sys
 import traceback
@@ -13,7 +12,18 @@ import traceback
 from logger import Logger
 
 SHOW_LOG = True
+import argparse
 
+parser = argparse.ArgumentParser(description="Predictor")
+parser.add_argument( "-m",
+                     "--model",
+                     type=str,
+                     help="Select model",
+                     required=True,
+                     default="LOG_REG",
+                     const="LOG_REG",
+                     nargs="?",
+                     choices=["LOG_REG", "BNB", "SVM"])
 
 class MultiModel():
 
@@ -21,26 +31,22 @@ class MultiModel():
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
-        self.config.read("config.ini")
-        self.X_train = pd.read_csv(
-            self.config["SPLIT_DATA"]["X_train"], index_col=0)
-        self.y_train = pd.read_csv(
-            self.config["SPLIT_DATA"]["y_train"], index_col=0)
-        self.X_test = pd.read_csv(
-            self.config["SPLIT_DATA"]["X_test"], index_col=0)
-        self.y_test = pd.read_csv(
-            self.config["SPLIT_DATA"]["y_test"], index_col=0)
-        sc = StandardScaler()
-        self.X_train = sc.fit_transform(self.X_train)
-        self.X_test = sc.transform(self.X_test)
-        self.project_path = os.path.join(os.getcwd(), "experiments")
-        self.log_reg_path = os.path.join(self.project_path, "log_reg.sav")
-        self.svm_path = os.path.join(self.project_path, "svm.sav")
-        self.gnb_path = os.path.join(self.project_path, "gnb.sav")
+        self.current_path = os.getcwd()
+        self.config.read(os.path.join(self.current_path, "config.ini"))
+
+        self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
+        self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
+        self.X_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_test"]), 'rb'))
+        self.y_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_test"]), 'rb'))
+
+        self.project_path = os.path.join(self.current_path, "experiments")
+        self.log_reg_path = os.path.join(self.project_path, "LR.pickle")
+        self.svm_path = os.path.join(self.project_path, "SVM.pickle")
+        self.gnb_path = os.path.join(self.project_path, "BNB.pickle")
         self.log.info("MultiModel is ready")
 
-    def log_reg(self, predict=False) -> bool:
-        classifier = LogisticRegression()
+    def log_reg(self, predict=False, max_iter = 200) -> bool:
+        classifier = LogisticRegression(max_iter=max_iter)
         try:
             classifier.fit(self.X_train, self.y_train)
         except Exception:
@@ -76,8 +82,8 @@ class MultiModel():
                   'path': self.svm_path}
         return self.save_model(classifier, self.svm_path, "SVM", params)
 
-    def gnb(self, predict=False) -> bool:
-        classifier = GaussianNB()
+    def bnb(self, predict=False) -> bool:
+        classifier = BernoulliNB()
         try:
             classifier.fit(self.X_train, self.y_train)
         except Exception:
@@ -91,8 +97,8 @@ class MultiModel():
 
     def save_model(self, classifier, path: str, name: str, params: dict) -> bool:
         self.config[name] = params
-        os.remove('config.ini')
-        with open('config.ini', 'w') as configfile:
+        os.remove(os.path.join(self.current_path, "config.ini"))
+        with open(os.path.join(self.current_path, "config.ini"), 'w') as configfile:
             self.config.write(configfile)
         with open(path, 'wb') as f:
             pickle.dump(classifier, f)
@@ -102,7 +108,15 @@ class MultiModel():
 
 
 if __name__ == "__main__":
+    args = parser.parse_args()
     multi_model = MultiModel()
-    multi_model.log_reg(predict=True)
-    multi_model.svm(use_config=False, predict=True)
-    multi_model.gnb(predict=True)
+    if args.model == 'LOG_REG':
+        multi_model.log_reg(predict=True, max_iter=200)
+    if args.model == 'SVM':
+        multi_model.svm(use_config=False, predict=True)
+    if args.model == 'BNB':
+        multi_model.bnb(predict=True)
+
+#model_Evaluate(BNBmodel)
+
+

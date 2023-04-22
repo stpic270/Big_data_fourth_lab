@@ -6,9 +6,9 @@ import pickle
 import sys
 
 import traceback
-from Tests import model_Evaluate, graphic
+from src.Tests import model_Evaluate, graphic
 
-from logger import Logger
+from src.logger import Logger
 
 SHOW_LOG = True
 
