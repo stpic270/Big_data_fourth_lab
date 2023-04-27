@@ -19,7 +19,7 @@ class Predictor():
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
-        self.current_path = os.getcwd()
+        self.current_path = os.path.join(os.getcwd(), 'src')
         self.config.read(os.path.join(self.current_path, "config.ini"))
         self.parser = argparse.ArgumentParser(description="Predictor")
         self.parser.add_argument("-m",

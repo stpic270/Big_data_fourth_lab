@@ -31,7 +31,7 @@ class MultiModel():
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
-        self.current_path = os.getcwd()
+        self.current_path = os.path.join(os.getcwd(), 'src')
         self.config.read(os.path.join(self.current_path, "config.ini"))
 
         self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
@@ -93,7 +93,7 @@ class MultiModel():
             y_pred = classifier.predict(self.X_test)
             print(accuracy_score(self.y_test, y_pred))
         params = {'path': self.gnb_path}
-        return self.save_model(classifier, self.gnb_path, "GNB", params)
+        return self.save_model(classifier, self.gnb_path, "BNB", params)
 
     def save_model(self, classifier, path: str, name: str, params: dict) -> bool:
         self.config[name] = params

@@ -113,7 +113,7 @@ class DataMaker():
         self.name, self.suffix = suffix_finder(args.file_name)
         self.train_path = [os.path.join(args.folder_path, 'X_train_' + self.name +'.pickle'), os.path.join(args.folder_path, 'y_train_' + '.pickle')]
         self.test_path = [os.path.join(args.folder_path, 'X_test_' + self.name +'.pickle'), os.path.join(args.folder_path, 'y_test_' + '.pickle')]
-        self.current_path = os.getcwd()
+        self.current_path = os.path.join(os.getcwd(), 'src')
         self.LOG_REG_path = os.path.join(self.current_path, 'experiments', 'LR.pickle')
         self.SVM_path = os.path.join(self.current_path, 'experiments', 'SVM.pickle')
         self.BNB_path = os.path.join(self.current_path, 'experiments', 'BNB.pickle')
