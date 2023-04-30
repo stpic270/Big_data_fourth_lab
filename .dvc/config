@@ -1,5 +1,4 @@
 [core]
-    remote = remote_storage
-    autostage = true
-['remote "remote_storage"']
-    url = C:\Users\Степан\Desktop\Github\Big_data\First_lab\1
+    remote = storage
+['remote "storage"']
+    url = C:\dvc_cache\1
