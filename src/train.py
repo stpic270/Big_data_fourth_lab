@@ -31,15 +31,16 @@ class MultiModel():
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
-        self.current_path = os.path.join(os.getcwd(), 'src')
-        self.config.read(os.path.join(self.current_path, "config.ini"))
+        self.current_path = os.path.join(os.getcwd())
+        self.config_path = os.path.join(self.current_path, "src", "config.ini")
+        self.config.read(self.config_path)
 
         self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
         self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
         self.X_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_test"]), 'rb'))
         self.y_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_test"]), 'rb'))
 
-        self.project_path = os.path.join(self.current_path, "experiments")
+        self.project_path = os.path.join(self.current_path, "src", "experiments")
         self.log_reg_path = os.path.join(self.project_path, "LR.pickle")
         self.svm_path = os.path.join(self.project_path, "SVM.pickle")
         self.gnb_path = os.path.join(self.project_path, "BNB.pickle")
@@ -70,6 +71,7 @@ class MultiModel():
         else:
             classifier = SVC(kernel=kernel, random_state=random_state)
         try:
+
             classifier.fit(self.X_train, self.y_train)
         except Exception:
             self.log.error(traceback.format_exc())
@@ -97,8 +99,8 @@ class MultiModel():
 
     def save_model(self, classifier, path: str, name: str, params: dict) -> bool:
         self.config[name] = params
-        os.remove(os.path.join(self.current_path, "config.ini"))
-        with open(os.path.join(self.current_path, "config.ini"), 'w') as configfile:
+        os.remove(self.config_path)
+        with open(self.config_path, 'w') as configfile:
             self.config.write(configfile)
         with open(path, 'wb') as f:
             pickle.dump(classifier, f)

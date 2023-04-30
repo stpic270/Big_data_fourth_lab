@@ -106,7 +106,6 @@ class DataMaker():
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
-        self.project_path = os.path.join(os.getcwd().replace('src/', ''), "data")
         self.data_path = os.path.join(args.folder_path, args.file_name)
         self.X_path = os.path.join(args.folder_path, 'X_' + args.file_name)
         self.y_path = os.path.join(args.folder_path, 'y_' + args.file_name)
@@ -119,7 +118,10 @@ class DataMaker():
         self.BNB_path = os.path.join(self.current_path, 'experiments', 'BNB.pickle')
         self.Vectoriser_path = os.path.join(self.current_path, 'experiments', 'Vectoriser.pickle')
         self.log.info("DataMaker is ready")
-        self.config.read('config.ini')
+        try:
+            self.config.read('config.ini')
+        except UnicodeDecodeError as er:
+            self.config.read('config.ini', encoding='latin-1')
 
     def get_data(self) -> bool:
 
@@ -189,7 +191,7 @@ class DataMaker():
         self.config["LOG_REG"] = {'path': self.LOG_REG_path}
         self.config["Vectoriser"] = {'path': self.Vectoriser_path}
         self.log.info("Train and test data is ready")
-        with open('config.ini', 'w') as configfile:
+        with open(os.path.join(self.current_path, "config.ini"), 'w') as configfile:
             self.config.write(configfile)
         return os.path.isfile(self.train_path[0]) and\
             os.path.isfile(self.train_path[1]) and\

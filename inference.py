@@ -6,7 +6,7 @@ import pickle
 import sys
 
 import traceback
-from src.Tests import model_Evaluate, graphic
+from src.utils import model_Evaluate, graphic
 
 from src.logger import Logger
 
@@ -21,7 +21,7 @@ class Predictor():
         self.log = logger.get_logger(__name__)
         self.current_path = os.getcwd()
 
-        self.config.read(os.path.join(self.current_path, "config.ini"))
+        self.config.read(os.path.join(self.current_path, "main_config.ini"))
         self.parser = argparse.ArgumentParser(description="Predictor")
         self.parser.add_argument("-m",
                                  "--model",
@@ -32,6 +32,7 @@ class Predictor():
                                  const="LOG_REG",
                                  nargs="?",
                                  choices=["LOG_REG", "BNB", "SVM"])
+
         self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
         self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
         self.X_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_test"]), 'rb'))

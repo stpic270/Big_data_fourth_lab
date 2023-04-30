@@ -4,15 +4,8 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import roc_curve, auc
 
-# SHOW_LOG = True
-# config = configparser.ConfigParser()
-# current_path = os.getcwd().replace('\src', '')
-# config.read(os.path.join(current_path, "config.ini"))
-#
-# X_train = pickle.load(open(os.path.join(current_path, config["SPLIT_DATA"]["X_train"]), 'rb'))
-# print(type(X_train))
 def model_Evaluate(y_pred, y_test):
-    # Predict values for Test dataset
+
     # Print the evaluation metrics for the dataset.
     print(classification_report(y_test, y_pred))
     # Compute and plot the Confusion matrix
