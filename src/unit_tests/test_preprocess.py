@@ -5,13 +5,11 @@ import pandas as pd
 import sys
 
 sys.path.insert(1, os.path.join(os.getcwd(), "src"))
-
 from preprocess import DataMaker
-
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read("src/config.ini")
 
-
+print(config.sections())
 class TestDataMaker(unittest.TestCase):
 
     def setUp(self) -> None:

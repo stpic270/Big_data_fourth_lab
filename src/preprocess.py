@@ -20,12 +20,14 @@ from logger import Logger
 SHOW_LOG = True
 
 parser = argparse.ArgumentParser(description="Predictor")
-parser.add_argument("folder_path",
+parser.add_argument("--folder_path",
                     type=str,
-                    help="Path to the folder")
-parser.add_argument("file_name",
+                    help="Path to the folder",
+                    default="data/raw_data/example")
+parser.add_argument("--file_name",
                     type=str,
-                    help="Name of the main file")
+                    help="Name of the main file",
+                    default="data_example.csv")
 parser.add_argument("--split_scale",
                     type=float,
                     help="how to split data into train and test",
@@ -43,7 +45,6 @@ parser.add_argument("--train_vectoriser",
                     help="Train own vectoriser or use pretrained",
                     default=False)
 args = parser.parse_args()
-print(args.folder_path)
 
 # Defining set containing all stopwords in English :
 stopwordlist = ['a', 'about', 'above', 'after', 'again', 'ain', 'all', 'am', 'an',

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import roc_curve, auc
 
-def model_Evaluate(y_pred, y_test):
+def model_Evaluate(y_pred, y_test, savepath=None):
 
     # Print the evaluation metrics for the dataset.
     print(classification_report(y_test, y_pred))
@@ -20,8 +20,12 @@ def model_Evaluate(y_pred, y_test):
     plt.xlabel("Predicted values", fontdict = {'size':14}, labelpad = 10)
     plt.ylabel("Actual values" , fontdict = {'size':14}, labelpad = 10)
     plt.title ("Confusion Matrix", fontdict = {'size':18}, pad = 20)
+    if savepath is None:
+        plt.show()
+    else:
+        plt.savefig(savepath)
 
-def graphic(y_test, y_pred):
+def graphic(y_test, y_pred, savepath=None):
     fpr, tpr, thresholds = roc_curve(y_test, y_pred)
     roc_auc = auc(fpr, tpr)
     plt.figure()
@@ -32,4 +36,7 @@ def graphic(y_test, y_pred):
     plt.ylabel('True Positive Rate')
     plt.title('ROC CURVE')
     plt.legend(loc="lower right")
-    plt.show()
+    if savepath is None:
+        plt.show()
+    else:
+        plt.savefig(savepath)
