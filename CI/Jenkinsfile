@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDS=credentials('mle-template')
+        DOCKERHUB_CREDS=credentials('sptic270/bd-fl-d')
         LC_ALL = "en_US.UTF-8"
         LANG    = "en_US.UTF-8"
         LANGUAGE = "en_US.UTF-8"
@@ -16,13 +16,13 @@ options {
         stage('Clone github repository') {
             steps {
                 cleanWs()
-                bat 'chcp 65001 && git clone -b main https://github.com/IcyAltair/mle-template.git'
+                bat 'chcp 65001 && git clone -b main https://github.com/stpic270/Big_data_first_lab.git'
 				}
 			}
 
         stage('Checkout repo dir') {
             steps {
-                bat 'chcp 65001 && cd mle-template && dir'
+                bat 'chcp 65001 && cd Big_data_first_lab && dir'
 				}
 			}
 
@@ -39,13 +39,13 @@ options {
             steps {
                 script {
                     try {
-                        bat 'chcp 65001 && cd mle-template && docker-compose build'
+                        bat 'chcp 65001 && cd Big_data_first_lab && docker-compose build'
                         }
 
                     finally {
                     bat '''
                         chcp 65001
-                        cd mle-template
+                        cd Big_data_first_lab
                         docker-compose up -d
                         '''
                         }
@@ -60,10 +60,10 @@ options {
 
         stage('Checkout container logs') {
             steps {
-                dir("mle-template") {
+                dir("bd-fl-d") {
                         bat '''
                             docker-compose up -d
-                            for /f %%i in ('docker ps -qf "name=^mle-template-web-1"') do set containerId=%%i
+                            for /f %%i in ('docker ps -qf "name=^bd-fl-d-web-1"') do set containerId=%%i
                             echo %containerId%
                             IF "%containerId%" == "" (
                                 echo "No container running"
@@ -78,7 +78,7 @@ options {
 
         stage('Checkout coverage report'){
             steps{
-                dir("mle-template"){
+                dir("bd-fl-d"){
                     bat '''
                     docker-compose logs -t --tail 10
                     '''
@@ -88,7 +88,7 @@ options {
 
         stage('Push'){
             steps{
-                bat 'chcp 65001 && docker push altairzero/mle-template:latest'
+                bat 'chcp 65001 && docker push stpic270/bd-fl-d:latest'
             }
         }
 	}
