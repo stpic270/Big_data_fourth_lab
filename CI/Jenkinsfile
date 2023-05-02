@@ -1,3 +1,4 @@
+import hudson.*;
 pipeline {
     agent any
 
