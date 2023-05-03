@@ -92,11 +92,10 @@ pipeline {
                 bat 'chcp 65001 && docker push stpic270/bd-fl-d:latest'
             }
         }
-	}
-
-    post {
-        always {
-            bat 'chcp 65001 && docker logout'
+        stage('Post always'){
+            steps{
+                 bat 'chcp 65001 && docker logout'
+            }
         }
-    }
+	}
 }
