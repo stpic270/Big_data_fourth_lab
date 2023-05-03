@@ -9,10 +9,10 @@ pipeline {
         LANGUAGE = "en_US.UTF-8"
     }
 
-options {
-        timestamps()
-        skipDefaultCheckout(true)
-	}
+    options {
+            timestamps()
+            skipDefaultCheckout(true)
+        }
     stages {
         stage('Clone github repository') {
             steps {
