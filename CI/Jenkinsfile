@@ -96,9 +96,7 @@ pipeline {
 
     post {
         always {
-            node('docker'){
-                bat 'chcp 65001 && docker logout'
-            }
+            bat 'chcp 65001 && docker logout'
         }
     }
 }
