@@ -3,7 +3,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDS=credentials('sptic270/bd-fl-d')
+        DOCKERHUB_CREDS=credentials('sikasi')
         LC_ALL = "en_US.UTF-8"
         LANG    = "en_US.UTF-8"
         LANGUAGE = "en_US.UTF-8"
@@ -14,6 +14,12 @@ pipeline {
             skipDefaultCheckout(true)
         }
     stages {
+
+        stage('PC get name'){
+            steps{
+                bat 'wmic computersystem get name'
+            }
+        }
         stage('Clone github repository') {
             steps {
                 cleanWs()
