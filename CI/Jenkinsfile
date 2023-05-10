@@ -15,45 +15,40 @@ pipeline {
         }
     stages {
 
-        stage('PC get name'){
-            steps{
-                bat 'wmic computersystem get name'
-            }
-        }
+
         stage('Clone github repository') {
             steps {
                 cleanWs()
-                bat 'chcp 65001 && git clone -b main https://github.com/stpic270/Big_data_first_lab.git'
+                sh 'git clone -b main https://github.com/stpic270/Big_data_first_lab.git'
 				}
 			}
 
         stage('Checkout repo dir') {
             steps {
-                bat 'chcp 65001 && cd Big_data_first_lab && dir'
+                sh 'cd Big_data_first_lab && dir'
 				}
 			}
 
         stage('Login'){
             steps{
-                //withCredentials([usernamePassword(credentialsId: 'mle-template', passwordVariable: 'DOCKER_REGISTRY_PWD', usernameVariable: 'DOCKER_REGISTRY_USER')]){
-                //bat 'chcp 65001 && echo %DOCKER_REGISTRY_PWD% | docker login -u %DOCKER_REGISTRY_USER% --password-stdin'}
-                //bat 'chcp 65001 && echo %DOCKERHUB_CREDS_PSW% | docker login -u %DOCKERHUB_CREDS_USR% --password-stdin'
-                bat 'docker login -u %DOCKERHUB_CREDS_USR% -p %DOCKERHUB_CREDS_PSW%'
+                //withCredentials([usernamePassword(credentialsId: 'sikasi', passwordVariable: 'DOCKER_REGISTRY_PWD', usernameVariable: 'DOCKER_REGISTRY_USER')]){
+                //sh 'echo %DOCKER_REGISTRY_PWD% | docker login -u %DOCKER_REGISTRY_USER% --password-stdin'}
+                // echo '%DOCKERHUB_CREDS_USR%'
+                sh 'echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin'
+                // sh 'docker login -u %DOCKERHUB_CREDS_USR% -p %DOCKERHUB_CREDS_PSW%'
                 }
             }
-
-        stage('Create and run docker container') {
+		stage('Create and run docker container') {
             steps {
                 script {
                     try {
-                        bat 'chcp 65001 && cd Big_data_first_lab && docker-compose build'
+                        sh 'cd Big_data_first_lab && docker compose build'
                         }
 
                     finally {
-                    bat '''
-                        chcp 65001
+                    sh '''
                         cd Big_data_first_lab
-                        docker-compose up -d
+                        docker compose up -d
                         '''
                         }
 				    }
@@ -67,10 +62,10 @@ pipeline {
 
         stage('Checkout container logs') {
             steps {
-                dir("bd-fl-d") {
-                        bat '''
-                            docker-compose up -d
-                            for /f %%i in ('docker ps -qf "name=^bd-fl-d-web-1"') do set containerId=%%i
+                dir("Big_data_first_lab") {
+                        sh '''
+                            docker compose up -d
+                            for /f %%i in ('docker ps -qf "name=^big_data_first_lab-web-1"') do set containerId=%%i
                             echo %containerId%
                             IF "%containerId%" == "" (
                                 echo "No container running"
@@ -85,9 +80,9 @@ pipeline {
 
         stage('Checkout coverage report'){
             steps{
-                dir("bd-fl-d"){
-                    bat '''
-                    docker-compose logs -t --tail 10
+                dir("Big_data_first_lab"){
+                    sh '''
+                    docker compose logs -t --tail 10
                     '''
                 }
             }
@@ -95,12 +90,12 @@ pipeline {
 
         stage('Push'){
             steps{
-                bat 'chcp 65001 && docker push stpic270/bd-fl-d:latest'
+                sh 'docker push stpic270/bd-fl-d:latest'
             }
         }
         stage('Post always'){
             steps{
-                 bat 'chcp 65001 && docker logout'
+                 sh 'docker logout'
             }
         }
 	}
