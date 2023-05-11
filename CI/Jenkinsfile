@@ -65,14 +65,15 @@ pipeline {
                 dir("Big_data_first_lab") {
                         sh '''
                             docker compose up -d
-                            for /f %%i in ('docker ps -qf "name=^big_data_first_lab-web-1"') do set containerId=%%i
-                            echo %containerId%
-                            IF "%containerId%" == "" (
-                                echo "No container running"
-                            )
-                            ELSE (
-                                docker logs --tail 1000 -f %containerId%
-                                )
+                            containerId=$(docker ps -a -q -f "name=^big_data_first_lab-web-1$")
+                            echo "$containerId"
+                            if ["$containerId" -eq ""]
+                            then
+                                echo "No container"
+                            else
+                                echo "There is a container"
+                                docker logs --tail 1000 -f $containerId
+                            fi
                         '''
                     }
             }

@@ -33,8 +33,8 @@ class Predictor():
                                  nargs="?",
                                  choices=["LOG_REG", "BNB", "SVM"])
 
-        self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
-        self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
+        # self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
+        # self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
         self.X_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_test"]), 'rb'))
         self.y_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_test"]), 'rb'))
         self.log.info("Predictor is ready")
