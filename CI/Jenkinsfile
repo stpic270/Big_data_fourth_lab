@@ -89,11 +89,11 @@ pipeline {
             }
         }
 
-        stage('Push'){
-            steps{
-                sh 'docker push stpic270/bd-fl-d:latest'
-            }
-        }
+//         stage('Push'){
+//             steps{
+//                 sh 'docker push stpic270/bd-fl-d:latest'
+//             }
+//         }
         stage('Post always'){
             steps{
                  sh 'docker logout'
