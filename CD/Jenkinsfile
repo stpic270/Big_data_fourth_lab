@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDS=credentials('sptic270/bd-fl-d')
+        DOCKERHUB_CREDS=credentials('sikasi')
         LC_ALL = "en_US.UTF-8"
         LANG    = "en_US.UTF-8"
         LANGUAGE = "en_US.UTF-8"
@@ -18,14 +18,14 @@ options {
             steps{
                 //withCredentials([usernamePassword(credentialsId: 'mle-template', passwordVariable: 'DOCKER_REGISTRY_PWD', usernameVariable: 'DOCKER_REGISTRY_USER')]){
                 //bat 'chcp 65001 && echo %DOCKER_REGISTRY_PWD% | docker login -u %DOCKER_REGISTRY_USER% --password-stdin'}
-                //bat 'chcp 65001 && echo %DOCKERHUB_CREDS_PSW% | docker login -u %DOCKERHUB_CREDS_USR% --password-stdin'
-                bat 'docker login -u %DOCKERHUB_CREDS_USR% -p %DOCKERHUB_CREDS_PSW%'
+                sh 'echo $DOCKERHUB_CREDS_PSW | docker login -u $DOCKERHUB_CREDS_USR --password-stdin'
+//                 sh 'docker login -u %DOCKERHUB_CREDS_USR% -p %DOCKERHUB_CREDS_PSW%'
                 }
             }
 
         stage('Pull image'){
             steps{
-                bat '''
+                sh '''
                         docker pull sptic270/bd-fl-d:latest
                 '''
             }
@@ -33,7 +33,7 @@ options {
 
         stage('Run container'){
             steps{
-                bat '''
+                sh '''
                         docker run --name first-lab -p 71:70 -d sptic270/bd-fl-d:latest
                 '''
             }
@@ -42,7 +42,7 @@ options {
 
     post {
         always {
-            bat 'docker stop first-lab && docker logout'
+            sh 'docker stop first-lab && docker logout'
         }
     }
 }

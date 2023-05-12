@@ -1,8 +1,8 @@
 version: '3.1'
 services:
    web:
-       build: .
-       command: bash -c "python src/preprocess.py && python src/train.py -m BNB && python src/predict.py -m BNB -t func && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m"
+       image: stpic270/bd-fl-d:latest
+       restart: always
        ports:
            - 77:70
-       image: stpic270/bd-fl-d:latest
+       command: bash -c "python src/preprocess.py && python src/train.py -m BNB && python src/predict.py -m BNB -t func && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m"
