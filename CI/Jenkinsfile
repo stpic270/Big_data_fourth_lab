@@ -72,7 +72,7 @@ pipeline {
                                 echo "No container"
                             else
                                 echo "There is a container"
-                                docker logs --tail 1000 -f $containerId
+                                docker logs --tail 20 -f $containerId
                             fi
                         '''
                     }
@@ -83,17 +83,17 @@ pipeline {
             steps{
                 dir("Big_data_first_lab"){
                     sh '''
-                    docker compose logs -t --tail 10
+                    docker compose logs -t --tail 20
                     '''
                 }
             }
         }
 
-//         stage('Push'){
-//             steps{
-//                 sh 'docker push stpic270/bd-fl-d:latest'
-//             }
-//         }
+        stage('Push'){
+            steps{
+                sh 'docker push stpic270/bd-fl-d:latest'
+            }
+        }
         stage('Post always'){
             steps{
                  sh 'docker logout'
