@@ -43,7 +43,7 @@ parser.add_argument("--ngrams",
 parser.add_argument("--train_vectoriser",
                     type=float,
                     help="Train own vectoriser or use pretrained",
-                    default=False)
+                    default=True)
 args = parser.parse_args()
 
 # Defining set containing all stopwords in English :
