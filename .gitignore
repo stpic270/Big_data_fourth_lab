@@ -130,3 +130,7 @@ dmypy.json
 
 # Place data for non local DVC
 # /data
+
+src/experiments/Vectoriser.pickle
+data/y_train_vectorised.pickle
+data/X_train_vectorised.pickle

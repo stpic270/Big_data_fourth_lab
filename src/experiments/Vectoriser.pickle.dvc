@@ -1,0 +1,4 @@
+outs:
+- md5: d7dd3b75bb026397c9d0c5e40a112d1f
+  size: 92012424
+  path: Vectoriser.pickle
