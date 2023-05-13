@@ -34,7 +34,7 @@ options {
         stage('Run container'){
             steps{
                 sh '''
-                        docker run --name first-lab -p 71:70 -d stpic270/bd-fl-d:latest
+                        docker run -it --name first-lab -p 71:70 -d stpic270/bd-fl-d:latest
                 '''
             }
         }
