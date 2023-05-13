@@ -26,7 +26,7 @@ options {
         stage('Pull image'){
             steps{
                 sh '''
-                        docker pull sptic270/bd-fl-d:latest
+                        docker pull stpic270/bd-fl-d:latest
                 '''
             }
         }
