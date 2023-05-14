@@ -20,6 +20,9 @@ SHOW_LOG = True
 class Predictor():
 
     def __init__(self) -> None:
+        """
+        Initialization the paths and parser
+        """
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
@@ -52,6 +55,7 @@ class Predictor():
 
 
     def predict(self) -> bool:
+        "Prediction on the tests with chosen model"
         args = self.parser.parse_args()
         try:
             classifier = pickle.load(
@@ -82,9 +86,11 @@ class Predictor():
                 self.log.error(traceback.format_exc())
                 sys.exit(1)
 
+            # Find name of file without extension
             s = self.config["SPLIT_DATA"]["x_train"]
             pattern = r'\w+.pickle'
             name = re.findall(pattern, s)[0].replace('X_', '').replace('.pickle', '')
+            # Create logs
             self.log.info(
                 f'{self.config[args.model]["path"]} passed func test {name}')
             exp_data = {
@@ -99,8 +105,10 @@ class Predictor():
             str_date_time = date_time.strftime("%Y_%m_%d_%H_%M_%S")
             exp_dir = os.path.join(exp_path, f'exp_{name}_{str_date_time}')
             os.mkdir(exp_dir)
+            # Dump logs
             with open(os.path.join(exp_dir, "exp_config.yaml"), 'w') as exp_f:
                 yaml.safe_dump(exp_data, exp_f, sort_keys=False)
+            # Output results
             model_Evaluate(score, self.y_test, os.path.join(exp_dir, "conf_matrix.png"))
             graphic(self.y_test, score, os.path.join(exp_dir, "praph.png"))
             shutil.copy(os.path.join(os.getcwd(), "src", "logfile.log"), os.path.join(exp_dir, "exp_logfile.log"))

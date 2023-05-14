@@ -66,44 +66,52 @@ stopwordlist = ['a', 'about', 'above', 'after', 'again', 'ain', 'all', 'am', 'an
 
 
 def suffix_finder(sent):
+    """
+    sent - input word
+    """
     pattern = r'\.?\w+'
+    # Find suffix
     find_sp = re.findall(pattern, sent)
     name, suffix = find_sp[0], find_sp[1]
     return name, suffix
-# Cleaning and removing the above stop words list from the tweet text :
+
 def cleaning_stopwords(text):
+    # Cleaning and removing the above stop words list from the tweet text :
     STOPWORDS = set(stopwordlist)
     return " ".join([word for word in str(text).split() if word not in STOPWORDS])
 
-#  Cleaning and removing punctuations :
 def cleaning_punctuations(text):
+    #  Cleaning and removing punctuations :
     english_punctuations = string.punctuation
     punctuations_list = english_punctuations
     translator = str.maketrans('', '', punctuations_list)
     return text.translate(translator)
 
-# Cleaning and removing URL’s :
 def cleaning_URLs(data):
+    # Cleaning and removing URL’s :
     return re.sub('((www.[^s]+)|(https?://[^s]+))', ' ', data)
 
-# Cleaning and removing Numeric numbers :
 def cleaning_numbers(data):
+    # Cleaning and removing Numeric numbers :
     return re.sub('[0-9]+', '', data)
 
-# Applying Stemming :
 def stemming_on_text(data):
+    # Applying Stemming :
     st = nltk.PorterStemmer()
     text = [st.stem(word) for word in data]
     return text
 
-# Applying Lemmatizer :
 def lemmatizer_on_text(data):
+    # Applying Lemmatizer :
     lm = nltk.WordNetLemmatizer()
     text = [lm.lemmatize(word) for word in data]
     return text
 class DataMaker():
 
     def __init__(self) -> None:
+        """
+        Initialization paths for data and weights for models
+        """
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
@@ -167,7 +175,7 @@ class DataMaker():
 
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=test_size, random_state=0)
-        # Applying vectorization
+        # Applying vectorization if args.train_vectoriser is True
         if args.train_vectoriser:
             vectoriser = TfidfVectorizer(ngram_range=args.ngrams, max_features=args.max_features)
             vectoriser.fit(X_train)

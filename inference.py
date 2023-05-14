@@ -16,6 +16,9 @@ SHOW_LOG = True
 class Predictor():
 
     def __init__(self) -> None:
+        """
+        Initialization paths for data and weights for models
+        """
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
@@ -32,7 +35,7 @@ class Predictor():
                                  const="LOG_REG",
                                  nargs="?",
                                  choices=["LOG_REG", "BNB", "SVM"])
-
+        # The following 2 strings could be used for training after adding paths in main_config.ini
         # self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
         # self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
         self.X_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_test"]), 'rb'))

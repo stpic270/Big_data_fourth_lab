@@ -5,7 +5,9 @@ from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import roc_curve, auc
 
 def model_Evaluate(y_pred, y_test, savepath=None):
-
+    """
+    Plot confusion matrix
+    """
     # Print the evaluation metrics for the dataset.
     print(classification_report(y_test, y_pred))
     # Compute and plot the Confusion matrix
@@ -26,6 +28,9 @@ def model_Evaluate(y_pred, y_test, savepath=None):
         plt.savefig(savepath)
 
 def graphic(y_test, y_pred, savepath=None):
+    """
+    Plot ROC AUC graph
+    """
     fpr, tpr, thresholds = roc_curve(y_test, y_pred)
     roc_auc = auc(fpr, tpr)
     plt.figure()

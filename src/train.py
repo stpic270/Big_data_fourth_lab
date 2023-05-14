@@ -28,6 +28,9 @@ parser.add_argument( "-m",
 class MultiModel():
 
     def __init__(self) -> None:
+        """
+        Initialization paths for data and weights for future models
+        """
         logger = Logger(SHOW_LOG)
         self.config = configparser.ConfigParser()
         self.log = logger.get_logger(__name__)
@@ -47,6 +50,9 @@ class MultiModel():
         self.log.info("MultiModel is ready")
 
     def log_reg(self, predict=False, max_iter = 200) -> bool:
+        """
+        Train logistic regression model
+        """
         classifier = LogisticRegression(max_iter=max_iter)
         try:
             classifier.fit(self.X_train, self.y_train)
@@ -60,6 +66,9 @@ class MultiModel():
         return self.save_model(classifier, self.log_reg_path, "LOG_REG", params)
 
     def svm(self, use_config: bool, kernel="linear", random_state=0, predict=False) -> bool:
+        """
+        Train SVM
+        """
         if use_config:
             try:
                 classifier = SVC(kernel=self.config["SVM"]["kernel"], random_state=self.config.getint(
@@ -85,6 +94,9 @@ class MultiModel():
         return self.save_model(classifier, self.svm_path, "SVM", params)
 
     def bnb(self, predict=False) -> bool:
+        """
+        Train Bernoulli naive bayes model
+        """
         classifier = BernoulliNB()
         try:
             classifier.fit(self.X_train, self.y_train)
@@ -98,6 +110,7 @@ class MultiModel():
         return self.save_model(classifier, self.gnb_path, "BNB", params)
 
     def save_model(self, classifier, path: str, name: str, params: dict) -> bool:
+        # Save trained models
         self.config[name] = params
         os.remove(self.config_path)
         with open(self.config_path, 'w') as configfile:
