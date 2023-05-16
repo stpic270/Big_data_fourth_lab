@@ -1,0 +1,4 @@
+outs:
+- md5: ffd3e5d8b9631b2a79efee2e4b229a6f
+  size: 367510997
+  path: X_train_vectorised.pickle
