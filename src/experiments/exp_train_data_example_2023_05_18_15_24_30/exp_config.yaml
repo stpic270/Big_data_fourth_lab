@@ -1,0 +1,8 @@
+model: SVM
+model params:
+  path: "C:\\Users\\\u0421\u0442\u0435\u043F\u0430\u043D\\Desktop\\Github\\Big_data\\\
+    Big_data_second_lab\\src\\experiments\\SVM.pickle"
+tests: func
+score: '[0 0 0 0 0]'
+X_test path: data/raw_data/example\X_test_data_example.pickle
+y_test path: data/raw_data/example\y_test_.pickle

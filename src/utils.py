@@ -3,13 +3,24 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import roc_curve, auc
+import pandas as pd
+import os
 
-def model_Evaluate(y_pred, y_test, savepath=None):
+def model_Evaluate(y_pred, y_test, model, suffix=None, savepath_graph=None, save_csv=False):
     """
     Plot confusion matrix
     """
-    # Print the evaluation metrics for the dataset.
-    print(classification_report(y_test, y_pred))
+    # Print the evaluation metrics for the dataset and make CSV file.
+    report = classification_report(y_test, y_pred, output_dict=True)
+    df = pd.DataFrame.from_dict(report).T
+    df = df.drop(['support'], axis=1)
+    print(df)
+    if save_csv==True and suffix != None:
+        if not os.path.exists(f'test/{model}'):
+            os.mkdir(f'test/{model}')
+        number_of_tests = len([f for f in os.listdir(f'test/{model}') if suffix in f])
+        savepath_csv = f'test/{model}/{suffix}_{number_of_tests}.csv'
+        df.to_csv(savepath_csv)
     # Compute and plot the Confusion matrix
     cf_matrix = confusion_matrix(y_test, y_pred)
     categories = ['Negative','Positive']
@@ -22,10 +33,10 @@ def model_Evaluate(y_pred, y_test, savepath=None):
     plt.xlabel("Predicted values", fontdict = {'size':14}, labelpad = 10)
     plt.ylabel("Actual values" , fontdict = {'size':14}, labelpad = 10)
     plt.title ("Confusion Matrix", fontdict = {'size':18}, pad = 20)
-    if savepath is None:
+    if savepath_graph is None:
         plt.show()
     else:
-        plt.savefig(savepath)
+        plt.savefig(savepath_graph)
 
 def graphic(y_test, y_pred, savepath=None):
     """

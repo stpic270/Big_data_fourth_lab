@@ -47,6 +47,14 @@ class Predictor():
                                  const="smoke",
                                  nargs="?",
                                  choices=["smoke", "func"])
+        self.parser.add_argument("-sc",
+                                 "--save_csv",
+                                 type=str,
+                                 help="Save csv or not",
+                                 required=False,
+                                 default=True,
+                                 nargs="?",
+                                 choices=[True, False])
         self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
         self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
         self.X_test = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_test"]), 'rb'))
@@ -56,7 +64,14 @@ class Predictor():
 
     def predict(self) -> bool:
         "Prediction on the tests with chosen model"
+
         args = self.parser.parse_args()
+        pattern = r'\.?\w+'
+        sent = os.path.join(self.current_path, "src","predict.py")
+        # Find suffix
+        find_sp = re.findall(pattern, sent)
+        suffix = find_sp[-2] + f'_{args.tests}'
+
         try:
             classifier = pickle.load(
                 open(os.path.join(self.current_path, self.config[args.model]["path"]), "rb"))
@@ -67,7 +82,7 @@ class Predictor():
         if args.tests == "smoke":
             try:
                 score = classifier.predict(self.X_test)
-                model_Evaluate(score, self.y_test)
+                model_Evaluate(score, self.y_test, model=args.model, suffix=suffix,save_csv=args.save_csv)
                 graphic(self.y_test, score)
                 print(f'{args.model} has {score} score')
             except Exception:
@@ -109,7 +124,7 @@ class Predictor():
             with open(os.path.join(exp_dir, "exp_config.yaml"), 'w') as exp_f:
                 yaml.safe_dump(exp_data, exp_f, sort_keys=False)
             # Output results
-            model_Evaluate(score, self.y_test, os.path.join(exp_dir, "conf_matrix.png"))
+            model_Evaluate(score, self.y_test, model=args.model, suffix=suffix,save_csv=args.save_csv, savepath_graph=os.path.join(exp_dir, "conf_matrix.png"))
             graphic(self.y_test, score, os.path.join(exp_dir, "praph.png"))
             shutil.copy(os.path.join(os.getcwd(), "src", "logfile.log"), os.path.join(exp_dir, "exp_logfile.log"))
             shutil.copy(self.config[args.model]["path"], os.path.join(exp_dir, f'exp_{args.model}.sav'))

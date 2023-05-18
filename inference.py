@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import os
+import re
 
 import pickle
 import sys
@@ -35,6 +36,14 @@ class Predictor():
                                  const="LOG_REG",
                                  nargs="?",
                                  choices=["LOG_REG", "BNB", "SVM"])
+        self.parser.add_argument("-sc",
+                                 "--save_csv",
+                                 type=str,
+                                 help="Save csv or not",
+                                 required=False,
+                                 default=True,
+                                 nargs="?",
+                                 choices=[True, False])
         # The following 2 strings could be used for training after adding paths in main_config.ini
         # self.X_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["X_train"]), 'rb'))
         # self.y_train = pickle.load(open(os.path.join(self.current_path, self.config["SPLIT_DATA"]["y_train"]), 'rb'))
@@ -53,8 +62,13 @@ class Predictor():
             sys.exit(1)
 
         try:
+            pattern = r'\.?\w+'
+            sent = os.path.join(self.current_path, "inference.py")
+            # Find suffix
+            find_sp = re.findall(pattern, sent)
+            suffix = find_sp[-2]
             score = classifier.predict(self.X_test)
-            model_Evaluate(score, self.y_test)
+            model_Evaluate(score, self.y_test, model=args.model, suffix=suffix,save_csv=args.save_csv)
             graphic(self.y_test, score)
             print(f'{args.model} has {score} score')
         except Exception:

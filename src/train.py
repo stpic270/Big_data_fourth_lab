@@ -61,7 +61,7 @@ class MultiModel():
             sys.exit(1)
         if predict:
             y_pred = classifier.predict(self.X_test)
-            print(accuracy_score(self.y_test, y_pred))
+            print('Accuracy on test data - ',accuracy_score(self.y_test, y_pred))
         params = {'path': self.log_reg_path}
         return self.save_model(classifier, self.log_reg_path, "LOG_REG", params)
 
@@ -87,7 +87,7 @@ class MultiModel():
             sys.exit(1)
         if predict:
             y_pred = classifier.predict(self.X_test)
-            print(accuracy_score(self.y_test, y_pred))
+            print('Accuracy on test data - ', accuracy_score(self.y_test, y_pred))
         params = {'kernel': kernel,
                   'random_state': random_state,
                   'path': self.svm_path}
@@ -105,7 +105,7 @@ class MultiModel():
             sys.exit(1)
         if predict:
             y_pred = classifier.predict(self.X_test)
-            print(accuracy_score(self.y_test, y_pred))
+            print('Accuracy on test data - ',accuracy_score(self.y_test, y_pred))
         params = {'path': self.gnb_path}
         return self.save_model(classifier, self.gnb_path, "BNB", params)
 
