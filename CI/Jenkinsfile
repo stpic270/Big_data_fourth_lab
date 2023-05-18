@@ -19,13 +19,13 @@ pipeline {
         stage('Clone github repository') {
             steps {
                 cleanWs()
-                sh 'git clone -b main https://github.com/stpic270/Big_data_first_lab.git'
+                sh 'git clone -b main https://github.com/stpic270/Big_data_second_lab.git'
 				}
 			}
 
         stage('Checkout repo dir') {
             steps {
-                sh 'cd Big_data_first_lab && dir'
+                sh 'cd Big_data_second_lab && dir'
 				}
 			}
 
@@ -42,12 +42,12 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh 'cd Big_data_first_lab && docker compose build'
+                        sh 'cd Big_data_second_lab && docker compose build'
                         }
 
                     finally {
                     sh '''
-                        cd Big_data_first_lab
+                        cd Big_data_second_lab
                         docker compose up -d
                         '''
                         }
@@ -62,10 +62,10 @@ pipeline {
 
         stage('Checkout container logs') {
             steps {
-                dir("Big_data_first_lab") {
+                dir("Big_data_second_lab") {
                         sh '''
                             docker compose up -d
-                            containerId=$(docker ps -a -q -f "name=^big_data_first_lab-web-1$")
+                            containerId=$(docker ps -a -q -f "name=^big_data_second_lab-web-1$")
                             echo "$containerId"
                             if ["$containerId" -eq ""]
                             then
@@ -81,7 +81,7 @@ pipeline {
 
         stage('Checkout coverage report'){
             steps{
-                dir("Big_data_first_lab"){
+                dir("Big_data_second_lab"){
                     sh '''
                     docker compose logs -t --tail 20
                     '''
@@ -91,7 +91,7 @@ pipeline {
 
         stage('Push'){
             steps{
-                sh 'docker push stpic270/bd-fl-d:latest'
+                sh 'docker push stpic270/bd-secl-d:latest'
             }
         }
         stage('Post always'){

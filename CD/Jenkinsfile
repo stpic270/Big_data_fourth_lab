@@ -26,7 +26,7 @@ options {
         stage('Pull image'){
             steps{
                 sh '''
-                        docker pull stpic270/bd-fl-d:latest
+                        docker pull stpic270/bd-secl-d:latest
                 '''
             }
         }
@@ -34,7 +34,7 @@ options {
         stage('Run container'){
             steps{
                 sh '''
-                        docker run -i -p 71:70 --name first-lab stpic270/bd-fl-d:latest
+                        docker run -i -p 71:70 --name second-lab stpic270/bd-secl-d:latest
                 '''
             }
         }
@@ -42,7 +42,7 @@ options {
 
     post {
         always {
-            sh 'docker stop first-lab && docker logout'
+            sh 'docker stop second-lab && docker logout'
         }
     }
 }
