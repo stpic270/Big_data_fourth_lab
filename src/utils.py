@@ -16,7 +16,7 @@ def model_Evaluate(y_pred, y_test, model, suffix=None, savepath_graph=None, save
     df = pd.DataFrame.from_dict(report).T
     df = df.drop(['support'], axis=1)
     df = df.rename(columns={'f1-score':'f1_score'})
-    df.index.name = 'labels name'
+    df.index.name = 'labels_name'
     print(df)
     if save_csv==True and suffix != None:
         if not os.path.exists(f'test/{model}'):
