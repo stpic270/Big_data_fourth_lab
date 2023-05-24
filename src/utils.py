@@ -10,6 +10,7 @@ def model_Evaluate(y_pred, y_test, model, suffix=None, savepath_graph=None, save
     """
     Plot confusion matrix
     """
+    model = model.lower()
     # Print the evaluation metrics for the dataset and make CSV file.
     target_names = ['negative label', 'positive label']
     report = classification_report(y_test, y_pred, output_dict=True, target_names=target_names)

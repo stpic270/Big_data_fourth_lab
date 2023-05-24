@@ -1,9 +1,20 @@
 version: '3.1'
 services:
-   web:
+    cassandra:
+      build: Dockerfiles/Cassandra/
+      volumes:
+        - cassandra_config:/config
+      image: stpic270/bd-secl-cassandra
+      command: bash -c "ip -4 -o address >> config/cassandra_config.txt"
+
+    model:
        build: .
-       restart: always
        ports:
            - 77:70
-       command: bash -c "python src/preprocess.py && python src/train.py -m BNB && python src/predict.py -m BNB -t func && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m"
+       volumes:
+           - cassandra_config:/app/test
        image: stpic270/bd-secl-d:latest
+       command: bash -c "python src/preprocess.py && python src/train.py -m BNB && python src/predict.py -m BNB -t func && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m"
+       command: bash -c "python use_cassandra.py"
+volumes:
+    cassandra_config:

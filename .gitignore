@@ -134,3 +134,5 @@ dmypy.json
 src/experiments/Vectoriser.pickle
 data/y_train_vectorised.pickle
 data/X_train_vectorised.pickle
+
+test/cassandra_config.txt
