@@ -15,12 +15,13 @@ with open('test/cassandra_config.txt', 'r') as f:
       credentials.append(line.strip()[le:])
     if p in s:
       le = len(p)
-      credentials.append(line.strip()[le:])
-    if '172.' in s:
-      sp = re.findall(pattern, s)
+      le2 = len(credentials[0])
+      credentials.append(line.strip()[le:le+le2])
+    if '172.' in line:
+      sp = re.findall(pattern, line)
       credentials.append(sp[0])
   f.close
-print(credentials)
+
 auth_provider = PlainTextAuthProvider(username=credentials[0], password=credentials[1])
 
 # Connect to the cluster's default port
@@ -64,9 +65,19 @@ def create_table(folder):
 
     #closing the file
     fares.close()
-  rows = session.execute(f"SELECT * FROM {file}")
-  for i in rows:
-    print(i)
+
+  if folder == 'svm':
+    print('Example of The following lines in cassandra database of svm model')
+    rows = session.execute(f"SELECT * FROM {file}")
+    for i in rows:
+      print(i)
 
 for m in ['BNB', 'SVM', 'LOG_REG']:
   create_table(m)
+
+with open("test/cassandra_config.txt", "r") as f:
+  lines = f.readlines()
+with open("test/cassandra_config.txt", "w") as f:
+  for line in lines:
+    if ('password:' or 'login:' in line) and lines.index(line)<2:
+      f.write(line)
