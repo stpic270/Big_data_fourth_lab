@@ -4,7 +4,7 @@ services:
       image: stpic270/bd-secl-cassandra
       volumes:
         - cassandra_config:/config
-      image: stpic270/bd-secl-cassandra
+
 
 
     model:
