@@ -51,7 +51,7 @@ pipeline {
                         cd Big_data_second_lab
                         docker compose up -d
                         docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -t -d -i stpic270/bd-secl-cassandra
-                        docker exec -i -t cassandra bash -c "echo '\n' >> config/cassandra_config.txt && ip -4 -o address >> config/cassandra_config.txt"
+                        docker exec -t cassandra bash -c "echo '\n' >> config/cassandra_config.txt && ip -4 -o address >> config/cassandra_config.txt"
                         '''
                         }
 				    }
@@ -63,7 +63,7 @@ pipeline {
                 sleep SLEEP_TIME_IN_SECONDS // seconds
                 echo "The follow infromation - presentation of svm csv that was imported to cassandra database"
                 sh """
-                docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t -i stpic270/bd-secl-d bash -c 'python use_cassandra.py'
+                docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t stpic270/bd-secl-d bash -c 'python use_cassandra.py'
                 """
             }
             
