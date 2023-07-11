@@ -59,9 +59,8 @@ pipeline {
             }
         stage ("wait_for_starting_the_cassandra_container and run model container script") {
             steps{
-                def time = params.SLEEP_TIME_IN_SECONDS
                 echo "Waiting ${SLEEP_TIME_IN_SECONDS} seconds for startingt the cassandra container"
-                sleep time.toInteger() // seconds
+                sleep SLEEP_TIME_IN_SECONDS // seconds
                 echo "The follow infromation - presentation of svm csv that was imported to cassandra database"
                 sh """
                 docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t -i stpic270/bd-secl-d bash -c 'python use_cassandra.py'
