@@ -50,7 +50,7 @@ pipeline {
                     sh  '''
                         cd Big_data_second_lab
                         docker compose up -d
-                        docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -t -d stpic270/bd-secl-cassandra
+                        docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -t -d -p 9042:9042 stpic270/bd-secl-cassandra
                         '''
                         }
 				    }
