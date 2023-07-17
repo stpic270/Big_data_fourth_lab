@@ -7,7 +7,7 @@ pipeline {
         LC_ALL = "en_US.UTF-8"
         LANG    = "en_US.UTF-8"
         LANGUAGE = "en_US.UTF-8"
-        SLEEP_TIME_IN_SECONDS1 = 300
+        SLEEP_TIME_IN_SECONDS1 = 420
         SLEEP_TIME_IN_SECONDS2 = 60
     }
 
