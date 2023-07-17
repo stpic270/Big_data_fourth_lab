@@ -15,8 +15,8 @@ pipeline {
             timestamps()
             skipDefaultCheckout(true)
         }
-    stages {
 
+    stages {
 
         stage('Clone github repository') {
             steps {
@@ -25,7 +25,7 @@ pipeline {
 				}
 			}
 
-        stage('Checkout repo dir') {
+        stage('cd to repo') {
             steps {
                 sh 'cd Big_data_second_lab && dir'
 				}
@@ -40,7 +40,8 @@ pipeline {
                 // sh 'docker login -u %DOCKERHUB_CREDS_USR% -p %DOCKERHUB_CREDS_PSW%'
                 }
             }
-		stage('Create and run docker container') {
+
+		stage('Run docker compose') {
             steps {
                 script {
                     try {
@@ -56,9 +57,9 @@ pipeline {
 				    }
                 }
             }
+
         stage ("wait_for_starting_the_cassandra_container and run model container script") {
             steps {
-                
                 sh """
                     docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -t -d -p 9042:9042 stpic270/bd-secl-cassandra
                    """
@@ -122,6 +123,7 @@ pipeline {
                 sh 'docker push stpic270/bd-secl-cassandra:latest'
             }
         }
+        
         stage('Post always'){
             steps{
                  sh 'docker logout'
