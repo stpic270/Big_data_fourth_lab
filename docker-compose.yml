@@ -5,6 +5,8 @@ services:
       volumes:
         - cassandra_config:/config
 
+      command: bash -c "echo '\n' >> config/cassandra_config.txt && ip -4 -o address >> config/cassandra_config.txt"
+
 
 
     model:
@@ -14,6 +16,7 @@ services:
        volumes:
            - cassandra_config:/app/test
        command: bash -c "python src/preprocess.py && python src/train.py -m BNB && python src/predict.py -m BNB -t func && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m"
+       command: bash -c "python use_cassandra.py"
 
 volumes:
     cassandra_config:
