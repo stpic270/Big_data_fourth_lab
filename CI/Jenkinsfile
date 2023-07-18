@@ -61,7 +61,7 @@ pipeline {
         stage ("wait_for_starting_the_cassandra_container and run model container script") {
             steps {
                 sh """
-                    docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -t -d -p 9042:9042 stpic270/bd-secl-cassandra
+                    docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -e HEAP_NEWSIZE=1M -e MAX_HEAP_SIZE=1024M -t -d -p 9042:9042 stpic270/bd-secl-cassandra
                    """
                 echo "Waiting ${SLEEP_TIME_IN_SECONDS1} seconds after startingt the cassandra container"
                 sleep SLEEP_TIME_IN_SECONDS1 // seconds
@@ -69,7 +69,7 @@ pipeline {
                     try{
                         sh """
                         docker exec -t cassandra bash -c "echo '\n' >> config/cassandra_config.txt && ip -4 -o address >> config/cassandra_config.txt"
-                        docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t -d -e HEAP_NEWSIZE=1M -e MAX_HEAP_SIZE=1024M stpic270/bd-secl-d bash -c 'python use_cassandra.py'
+                        docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t -d stpic270/bd-secl-d bash -c 'python use_cassandra.py'
                         """
                     }
                     catch (err) {
