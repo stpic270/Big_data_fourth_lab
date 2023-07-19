@@ -43,26 +43,26 @@ pipeline {
 
 		stage('Run docker compose') {
             steps {
+                // sh 'cd Big_data_second_lab && docker compose build'
                 script {
                     try {
                         sh 'cd Big_data_second_lab && docker compose build'
                         }
 
                     finally {
-                    sh  '''
+                        sh  '''
                         cd Big_data_second_lab
-                        docker compose up -d
+                        docker compose up -d --no-start
+                        docker start big_data_second_lab-model-1
+                        docker rm big_data_second_lab-cassandra-1
+                        docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -e HEAP_NEWSIZE=1M -e MAX_HEAP_SIZE=1024M -t -d -p 9042:9042 stpic270/bd-secl-cassandra
                         '''
                         }
 				    }
                 }
             }
-
         stage ("wait_for_starting_the_cassandra_container and run model container script") {
             steps {
-                sh """
-                    docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -e HEAP_NEWSIZE=1M -e MAX_HEAP_SIZE=1024M -t -d -p 9042:9042 stpic270/bd-secl-cassandra
-                   """
                 echo "Waiting ${SLEEP_TIME_IN_SECONDS1} seconds after startingt the cassandra container"
                 sleep SLEEP_TIME_IN_SECONDS1 // seconds
                 script{
@@ -77,18 +77,13 @@ pipeline {
                     }
                     finally {
                     sh "docker start model"
+                    sh "docker start model"
                     echo "Waiting ${SLEEP_TIME_IN_SECONDS2} seconds for getting logs from cassandra database from model's container"
                     sleep SLEEP_TIME_IN_SECONDS2 // seconds
                     }
                 }
             }
         }
-
-        // use for multi containers:
-        //docker exec %containerId% cd app && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m
-        //use for single container (with auth):
-        //docker run --name mle-template_web_1 cd app && coverage run src/unit_tests/test_preprocess.py && coverage run -a src/unit_tests/test_training.py && coverage report -m
-
         stage('Checkout container logs') {
             steps {
                 dir("Big_data_second_lab") {
@@ -104,9 +99,8 @@ pipeline {
                             fi
                         '''
                     }
+                }
             }
-        }
-
         stage('Checkout coverage report'){
             steps{
                 dir("Big_data_second_lab"){
@@ -129,5 +123,5 @@ pipeline {
                  sh 'docker logout'
             }
         }
-	}
+    }
 }
