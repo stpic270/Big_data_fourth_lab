@@ -82,7 +82,7 @@ options {
 
     post {
         always {
-            sh 'docker stop second-lab && docker logout'
+            sh 'docker stop cassandra && docker logout'
         }
     }
 }
