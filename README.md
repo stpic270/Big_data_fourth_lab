@@ -1,4 +1,4 @@
-# Semantic analysis 
+# Semantic analysis outputs to cassandra
 
 Описание работы модели семантического анализа находится по ссылке - https://github.com/stpic270/Big_data_first_lab. 
 
