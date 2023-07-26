@@ -5,12 +5,6 @@ services:
         volumes:
             - cassandra_config:/config
 
-        # healthcheck:
-        #     test: ["CMD-SHELL", "[ $$(nodetool statusgossip) = running ]"]
-        #     interval: 30s
-        #     timeout: 30s
-        #     retries: 7
-
         environment:
             - MAX_HEAP_SIZE=1024M
             - HEAP_NEWSIZE=1M
@@ -19,7 +13,7 @@ services:
 
 
     model:
-       image: stpic270/bd-secl-d:latest
+       image: stpic270/bd-thl-d:latest
        ports:
            - 77:70
        volumes:
