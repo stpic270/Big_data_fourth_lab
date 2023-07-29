@@ -8,8 +8,9 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install -r requirements.txt && python inference.py -m SVM &&  apt-get update && apt-get install pwgen -y &&\
-    echo $(pwgen 14 1) >> my_password.txt && \
+RUN chmod +x scripts/scr.sh && chmod +x scripts/cassandra.sh && pip install -r requirements.txt && \
+    python inference.py -m SVM &&  apt-get update && apt-get install pwgen -y &&\
+    echo $(pwgen 14 1) >> my_password.txt && apt-get install nano &&\
     apt install krb5-user -y && apt-get install ansible -y
     
-ENTRYPOINT ["ansible-vault", "encrypt", "--vault-password-file", "my_password.txt", "test/cassandra_config.txt"]
+ENTRYPOINT ["scripts/scr.sh"]

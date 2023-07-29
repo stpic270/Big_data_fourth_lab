@@ -2,6 +2,19 @@ from cassandra.auth import PlainTextAuthProvider
 from cassandra.cluster import Cluster
 import os
 import re
+import cassandra
+import time
+
+def executions(ses, q):
+  flag=True
+  while flag==True:
+    try:
+      ses.execute(q)
+      flag = False
+    except cassandra.OperationTimedOut as er:
+      print(er)
+      print(f'This time cassandra did not answerimplement the {q} querry, program will sleep for 10s and try again')
+      time.sleep(10)
 
 credentials = []
 pattern =r'(\d+.\d+.\d+.\d+)/\d+'
@@ -17,16 +30,29 @@ with open('test/cassandra_config.txt', 'r') as f:
       le = len(p)
       le2 = len(credentials[0])
       credentials.append(line.strip()[le:le+le2])
+  f.close
+
+with open('test/cassandra_ip.txt', 'r') as ip:
+  for line in ip:
     if '172.' in line:
       sp = re.findall(pattern, line)
       credentials.append(sp[0])
-  f.close
+  ip.close 
 
 auth_provider = PlainTextAuthProvider(username=credentials[0], password=credentials[1])
 
 # Connect to the cluster's default port
-cluster = Cluster([credentials[2]], port=9042, auth_provider=auth_provider)
-session = cluster.connect()
+flag=True
+while flag==True:
+  try:
+    cluster = Cluster([credentials[2]], port=9042, auth_provider=auth_provider)
+    session = cluster.connect()
+    flag = False
+  except cassandra.cluster.NoHostAvailable as er:
+    print(er)
+    print('This time cassandra did not answer, program will sleep for 40s and  try again')
+    time.sleep(40)
+
 
 def create_table(folder):
   folder = folder.lower()
@@ -35,20 +61,22 @@ def create_table(folder):
   s.insert(5, f'{folder}')
   s = ' '.join(s)
 
-  session.execute(s)
+  executions(session, s)
   # Connect to music_store
-  session.execute(f"USE {folder};")
+  executions(session, f"USE {folder};")
   path = f'test/{folder}'
   if not os.path.exists(path):
     print(f'There is not folder {folder} hence there are not csv files of {folder} model to import to cassandra')
     return None
+
   for file in os.listdir(path):
 
     path_f = f'test/{folder}/{file}'
     file = file.replace('.csv', '')
 
     q = f"CREATE TABLE IF NOT EXISTS {file} (labels_name text, precision float, recall float, f1_score float, PRIMARY KEY(labels_name));"
-    session.execute(q)
+    
+    executions(session, q)
 
     prepared = session.prepare(f"INSERT INTO {file} (labels_name, precision, recall, f1_score) VALUES (?, ?, ?, ?)")
     with open(path_f, "r") as fares:
@@ -79,5 +107,5 @@ with open("test/cassandra_config.txt", "r") as f:
   lines = f.readlines()
 with open("test/cassandra_config.txt", "w") as f:
   for line in lines:
-    if ('password:' or 'login:' in line) and lines.index(line)<2:
-      f.write(line)
+    
+    f.write('data uploaded to cassandra successful, secrets are removed\n')
