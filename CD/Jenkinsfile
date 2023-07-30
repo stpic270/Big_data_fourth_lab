@@ -37,7 +37,7 @@ options {
             steps{
 
                 sh 'docker run -v thl:/app/test --name model -d -t stpic270/bd-thl-d'
-                sh 'docker run -v thl:/config--name cassandra -d -t stpic270/bd-secl-cassandra'
+                sh 'docker run -v thl:/config --name cassandra -d -t stpic270/bd-secl-cassandra'
                 
                 echo "Waiting 30 seconds for entrypoint script"
                 sleep 30
