@@ -33,19 +33,18 @@ options {
             }
         }
 
-        stage('Run container'){
+        stage('Run container and get move results to cassandra'){
             steps{
 
-                sh 'docker start big_data_third_lab-model-1'
+                sh 'docker run -v thl:/app/test --name model -d -t stpic270/bd-thl-d'
+                sh 'docker run -v thl:/config--name cassandra -d -t stpic270/bd-secl-cassandra'
                 
                 echo "Waiting 30 seconds for entrypoint script"
                 sleep 30
                 
                 sh  '''
-                    docker start big_data_third_lab-cassandra-1
-                    docker exec -t big_data_third_lab-cassandra-1 bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
-                    docker exec -t big_data_third_lab-model-1 bash -c "scripts/cassandra.sh"
-                    docker stop big_data_third_lab-model-1
+                    docker exec -t cassandra bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
+                    docker exec -t model bash -c "scripts/cassandra.sh"
                     '''
                 }
         }
@@ -53,7 +52,7 @@ options {
 
     post {
         always {
-            sh 'docker stop big_data_third_lab-cassandra-1 && docker stop big_data_third_lab-model-1 && docker logout'
+            sh 'docker stop cassandra && docker stop model && docker logout'
         }
     }
 }
