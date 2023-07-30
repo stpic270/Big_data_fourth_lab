@@ -27,62 +27,33 @@ options {
         stage('Pull image'){
             steps{
                 sh '''
-                    docker pull stpic270/bd-secl-d:latest
-                    docker pull stpic270/bd-secl-cassandra:latest
+                    docker pull stpic270/bd-thl-d:latest
+                    docker pull stpic270/bd-thl-cassandra:latest
                 '''
             }
         }
 
         stage('Run container'){
             steps{
-                sh """docker run --name cassandra -v big_data_second_lab_cassandra_config:/config -e HEAP_NEWSIZE=1M -e MAX_HEAP_SIZE=1024M -t -d -p 9042:9042 stpic270/bd-secl-cassandra"""
-                echo "Waiting ${SLEEP_TIME_IN_SECONDS1} seconds after startingt the cassandra container"
-                sleep SLEEP_TIME_IN_SECONDS1 // seconds
-                sh """docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t -d stpic270/bd-secl-d bash -c 'python use_cassandra.py'"""
-                script{
-                    try{
-                        sh """
-                        docker exec -t cassandra bash -c "echo '\n' >> config/cassandra_config.txt && ip -4 -o address >> config/cassandra_config.txt"
-                        docker run --name model -v big_data_second_lab_cassandra_config:/app/test -t -i -p 71:70 stpic270/bd-secl-d bash -c 'python use_cassandra.py'
-                        """
-                    }
-                    catch (err) {
-                        echo "Failed: ${err}"
-                    }
-                    finally {
-                        sh  """  
-                            for i in \$(seq 1 2 20)
-                            do
-                                if docker logs --tail 20 -f model | grep -q 'Row(labels_name='; then
-                                    echo "Data was transported to cassandra"
-                                    break
-                                else 
-                                    docker start model
-                                fi
-                            done
-                            """
-                    }
+
+                sh 'docker start big_data_third_lab-model-1'
+                
+                echo "Waiting 30 seconds for entrypoint script"
+                sleep 30
+                
+                sh  '''
+                    docker start big_data_third_lab-cassandra-1
+                    docker exec -t big_data_third_lab-cassandra-1 bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
+                    docker exec -t big_data_third_lab-model-1 bash -c "scripts/cassandra.sh"
+                    docker stop big_data_third_lab-model-1
+                    '''
                 }
-                dir("Big_data_second_lab") {
-                        sh '''
-                            containerId=$(docker ps -a -q -f "name=^model$")
-                            echo "$containerId"
-                            if ["$containerId" -eq ""]
-                            then
-                                echo "No container"
-                            else
-                                echo "There is a container"
-                                docker logs --tail 20 -f $containerId
-                            fi
-                        '''
-                }
-            }
         }
 	}
 
     post {
         always {
-            sh 'docker stop cassandra && docker logout'
+            sh 'docker stop big_data_third_lab-cassandra-1 && docker stop big_data_third_lab-model-1 && docker logout'
         }
     }
 }
