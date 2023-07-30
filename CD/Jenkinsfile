@@ -28,7 +28,7 @@ options {
             steps{
                 sh '''
                     docker pull stpic270/bd-thl-d:latest
-                    docker pull stpic270/bd-thl-cassandra:latest
+                    docker pull stpic270/bd-secl-cassandra:latest
                 '''
             }
         }
