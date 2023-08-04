@@ -30,7 +30,6 @@ options {
                     docker network create kafkanet
                     docker pull stpic270/bd-fthl-d:latest
                     docker pull stpic270/bd-secl-cassandra:latest
-                    confluentinc/cp-kafka
                 '''
             }
         }
