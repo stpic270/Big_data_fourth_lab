@@ -85,7 +85,7 @@ pipeline {
 
         stage('Push'){
             steps{
-                sh 'docker push stpic270/bd-thl-d:latest'
+                sh 'docker push stpic270/bd-fthl-d:latest'
                 sh 'docker push stpic270/bd-secl-cassandra:latest'
                 sh 'docker stop $(docker ps -a -q)'
             }
