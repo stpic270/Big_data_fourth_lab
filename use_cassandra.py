@@ -4,6 +4,8 @@ import os
 import re
 import cassandra
 import time
+import json
+from kafka import KafkaProducer
 
 def executions(ses, q):
   flag=True
@@ -16,6 +18,7 @@ def executions(ses, q):
       print(f'This time cassandra did not answerimplement the {q} querry, program will sleep for 10s and try again')
       time.sleep(10)
 
+producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
 credentials = []
 pattern =r'(\d+.\d+.\d+.\d+)/\d+'
 
@@ -99,6 +102,11 @@ def create_table(folder):
     rows = session.execute(f"SELECT * FROM {file}")
     for i in rows:
       print(i)
+
+  rows = session.execute(f"SELECT * FROM {file}")
+  producer.send('cassandra-topic', json.dumps(f'From folder {folder}: ').encode('utf-8'))
+  for i in rows:
+    producer.send('cassandra-topic', json.dumps(i).encode('utf-8'))
 
 for m in ['BNB', 'SVM', 'LOG_REG']:
   create_table(m)

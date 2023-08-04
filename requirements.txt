@@ -8,3 +8,4 @@ nltk==3.8
 seaborn==0.12.2
 matplotlib==3.7.1
 cassandra-driver
+kafka-python
