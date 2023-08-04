@@ -28,6 +28,8 @@ options {
             steps{
                 sh '''
                     docker network create kafkanet
+                    docker run -d --network kafkanet --name zookeeper -e ZOOKEEPER_CLIENT_PORT=2181 -e ZOOKEEPER_TICK_TIME=2000 -p 2181:2181 confluentinc/cp-zookeeper
+                    docker run -d --network kafkanet --name kafka -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 -p 9092:9092 confluentinc/cp-kafka
                     docker pull stpic270/bd-fthl-d:latest
                     docker pull stpic270/bd-secl-cassandra:latest
                 '''
@@ -45,8 +47,6 @@ options {
                 
                 sh  '''
                     docker exec -t cassandra bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
-                    docker run -d --network kafkanet --name zookeeper -e ZOOKEEPER_CLIENT_PORT 2181 -e ZOOKEEPER_TICK_TIME 2000 -p 2181:2181 confluentinc/cp-zookeeper
-                    docker run -d --network kafkanet --name kafka -e KAFKA_ZOOKEEPER_CONNECT zookeeper:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR 1 -p 9092:9092 confluentinc/cp-kafka
                     docker exec -t -d kafka bash -c "/bin/kafka-topics --create --topic cassandra-topic --bootstrap-server kafka:9092"
                     '''
                 echo "Waiting 120 seconds for broker healthy running"
