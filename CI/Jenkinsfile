@@ -65,6 +65,7 @@ pipeline {
                     '''
                 echo "Waiting 120 seconds for broker healthy running"
                 sleep 120
+
                 sh  ''' 
                     docker exec -t big_data_fourth_lab-model-1 bash -c "scripts/cassandra.sh"
                     docker exec -t big_data_fourth_lab-kafka-1 bash -c "/bin/kafka-console-consumer --topic cassandra-topic --max-messages 12 --from-beginning --bootstrap-server kafka:9092"
@@ -72,21 +73,6 @@ pipeline {
                 }
             }
             
-        stage('Checkout container logs') {
-            steps {
-                sh  '''
-                    containerId=$(docker ps -a -q -f "name=^big_data_fourth_lab-model-1$")
-                    echo "$containerId"
-                    if ["$containerId" -eq ""]
-                    then
-                        echo "No container"
-                    else
-                        echo "There is a container"
-                        docker logs --tail 20 -f $containerId
-                    fi
-                    '''
-            }
-        }
         stage('Checkout coverage report'){
             steps{
                 dir("Big_data_fourth_lab"){
