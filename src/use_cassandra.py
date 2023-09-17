@@ -8,7 +8,6 @@ import json
 from kafka import KafkaProducer
 from utils import create_table, get_credentials, get_ip, executions
 
-producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
 pattern =r'(\d+.\d+.\d+.\d+)/\d+'
 
 credentials = get_credentials()
@@ -27,6 +26,8 @@ while flag==True:
     print(er)
     print('This time cassandra did not answer, program will sleep for 40s and  try again')
     time.sleep(40)
+
+producer = KafkaProducer(bootstrap_servers=['kafka:9092'])
 
 for m in ['BNB', 'SVM', 'LOG_REG']:
   create_table(m, session, producer)
