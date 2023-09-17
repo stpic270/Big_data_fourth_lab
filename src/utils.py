@@ -5,6 +5,11 @@ from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.metrics import roc_curve, auc
 import pandas as pd
 import os
+import cassandra
+import time
+from kafka import KafkaProducer
+import re
+import json
 
 def model_Evaluate(y_pred, y_test, model, suffix=None, savepath_graph=None, save_csv=False):
     """
@@ -60,3 +65,92 @@ def graphic(y_test, y_pred, savepath=None):
         plt.show()
     else:
         plt.savefig(savepath)
+
+
+def executions(ses, q):
+  flag=True
+  while flag==True:
+    try:
+      ses.execute(q)
+      flag = False
+    except cassandra.OperationTimedOut as er:
+      print(er)
+      print(f'This time cassandra did not answerimplement the {q} querry, program will sleep for 10s and try again')
+      time.sleep(10)
+
+def get_credentials():
+    credentials = []
+    l, p = 'login:', 'password:'
+    with open('test/cassandra_config.txt', 'r') as f:
+        for line in f:
+            s = line.strip()
+            if l in s:
+                le = len(l)
+                credentials.append(line.strip()[le:])
+            if p in s:
+                le = len(p)
+                le2 = len(credentials[0])
+                credentials.append(line.strip()[le:le+le2])
+    f.close
+    return credentials
+
+def get_ip(credentials, pattern):
+    with open('test/cassandra_ip.txt', 'r') as ip:
+        for i, line in enumerate(ip):
+            if '172.' in line or "eth0" in line:
+                sp = re.findall(pattern, line)
+                credentials.append(sp[0])
+        ip.close 
+
+    return credentials
+
+def create_table(folder, session, producer):
+  folder = folder.lower()
+  s = "CREATE KEYSPACE IF NOT EXISTS WITH REPLICATION={'class':'SimpleStrategy', 'replication_factor':5};"
+  s = s.split()
+  s.insert(5, f'{folder}')
+  s = ' '.join(s)
+
+  executions(session, s)
+  # Connect to music_store
+  executions(session, f"USE {folder};")
+  path = f'test/{folder}'
+  if not os.path.exists(path):
+    print(f'There is not folder {folder} hence there are not csv files of {folder} model to import to cassandra')
+    return None
+
+  for file in os.listdir(path):
+
+    path_f = f'test/{folder}/{file}'
+    file = file.replace('.csv', '')
+
+    q = f"CREATE TABLE IF NOT EXISTS {file} (labels_name text, precision float, recall float, f1_score float, PRIMARY KEY(labels_name));"
+    
+    executions(session, q)
+
+    prepared = session.prepare(f"INSERT INTO {file} (labels_name, precision, recall, f1_score) VALUES (?, ?, ?, ?)")
+    with open(path_f, "r") as fares:
+      for fare in fares:
+        columns=fare.split(",")
+        if 'labels_name' in columns:
+          continue
+        ln=columns[0]
+        pr=float(columns[1])
+        re=float(columns[2])
+        f1=float(columns[3])
+
+        session.execute(prepared, [ln,pr,re,f1])
+
+    #closing the file
+    fares.close()
+
+  if folder == 'svm':
+    print('Example of The following lines in cassandra database of svm model')
+    rows = session.execute(f"SELECT * FROM {file}")
+    for i in rows:
+      print(i)
+
+  rows = session.execute(f"SELECT * FROM {file}")
+  producer.send('cassandra-topic', json.dumps(f'From folder {folder}: ').encode('utf-8'))
+  for i in rows:
+    producer.send('cassandra-topic', json.dumps(i).encode('utf-8'))

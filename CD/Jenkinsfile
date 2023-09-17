@@ -40,7 +40,7 @@ options {
             steps{
 
                 sh 'docker run --network kafkanet -v fthl:/app/test --name model -d -t stpic270/bd-fthl-d'
-                sh 'docker run --network kafkanet -v fthl:/config --name cassandra -d -t stpic270/bd-secl-cassandra'
+                sh 'docker run --network kafkanet -v fthl:/config --name cassandra -e JAVA_TOOL_OPTIONS="-Xmx1024m" --memory 1.2g -d -t stpic270/bd-secl-cassandra'
                 
                 echo "Waiting 30 seconds for entrypoint script"
                 sleep 30
