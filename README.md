@@ -8,9 +8,9 @@
 1. Собрать и запустить контейнеры с помощью docker compose:
 ### - docker compose up -d --no-start
 2. Запустить контейнеры базы данных и модели(подождать 30 секунд после запуска):
-### - docker start big_data_third_lab-model-1 && docker start big_data_third_lab-cassandra-1
+### - docker start big_data_fourth_lab-model-1 && docker start big_data_fourth_lab-cassandra-1
 3. Выполнить следующие команды для передачи ip адресса базы данных.
-### - docker exec -t big_data_third_lab-cassandra-1 bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
+### - docker exec -t big_data_fourth_lab-cassandra-1 bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
 4. Запустить контейнеры kafka и zookeeper (подождать 2 мин после запуска):
 ### - docker start big_data_fourth_lab-zookeeper-1
 ### - docker start big_data_fourth_lab-kafka-1 && docker exec -t -d big_data_fourth_lab-kafka-1 bash -c "/bin/kafka-topics --create --topic cassandra-topic --bootstrap-server kafka:9092"
