@@ -54,7 +54,6 @@ options {
 
                 sh  ''' 
                     docker exec -t model bash -c "scripts/cassandra.sh"
-                    docker exec -t kafka bash -c "/bin/kafka-console-consumer --topic cassandra-topic --max-messages 12 --from-beginning --bootstrap-server kafka:9092"
                     '''
                 }
         }
