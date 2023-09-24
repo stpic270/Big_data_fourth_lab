@@ -2,6 +2,8 @@ version: '3.1'
 services:
     cassandra:
         image: stpic270/bd-secl-cassandra
+        depends_on:
+           - kafka
         volumes:
             - cassandra_config:/config
 
@@ -16,6 +18,8 @@ services:
 
     model:
        image: stpic270/bd-fthl-d:latest
+       depends_on:
+           - cassandra
        ports:
            - 77:70
        volumes:
@@ -33,7 +37,7 @@ services:
         depends_on:
            - zookeeper
         ports:
-           - 29092:29092
+           - 39092:29092
         environment:
             KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
             KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092

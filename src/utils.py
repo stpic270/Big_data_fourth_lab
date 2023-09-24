@@ -10,6 +10,8 @@ import time
 from kafka import KafkaProducer
 import re
 import json
+from cassandra.auth import PlainTextAuthProvider
+from cassandra.cluster import Cluster
 
 def model_Evaluate(y_pred, y_test, model, suffix=None, savepath_graph=None, save_csv=False):
     """
@@ -104,7 +106,7 @@ def get_ip(credentials, pattern):
 
     return credentials
 
-def create_table(folder, session, producer):
+def create_table(folder, session):
   # Make query to create namespace
   folder = folder.lower()
   s = "CREATE KEYSPACE IF NOT EXISTS WITH REPLICATION={'class':'SimpleStrategy', 'replication_factor':5};"
@@ -153,8 +155,52 @@ def create_table(folder, session, producer):
     for i in rows:
       print(i)
 
+def send_message_from_cassandra(folder, session, producer):
+
+  folder = folder.lower()
+  # Create file_spisok 
+  file_spisok = []
+
+  path = f'test/{folder}'
+  # Use keyspace
+  executions(session, f"USE {folder};")
+  
+  for file in os.listdir(path):
+
+    path_f = f'test/{folder}/{file}'
+    file = file.replace('.csv', '')
+    file_spisok.append(file)
+
   # Send messages using producer
-  rows = session.execute(f"SELECT * FROM {file}")
-  producer.send('cassandra-topic', json.dumps(f'From folder {folder}: ').encode('utf-8'))
-  for i in rows:
-    producer.send('cassandra-topic', json.dumps(i).encode('utf-8'))
+  for file in file_spisok:
+    rows = session.execute(f"SELECT * FROM {file}")
+    producer.send('cassandra-topic', json.dumps(f'From folder {folder}: ').encode('utf-8'))
+    for i in rows:
+      producer.send('cassandra-topic', json.dumps(i).encode('utf-8'))
+
+  print("Producer sent messages")
+
+def get_session():
+  # Pattern to get ip
+  pattern =r'(\d+.\d+.\d+.\d+)/\d+'
+
+  # Get credentials
+  credentials = get_credentials()
+  credentials = get_ip(credentials, pattern) # Add ip to credentials
+
+  auth_provider = PlainTextAuthProvider(username=credentials[0], password=credentials[1])
+
+  # Connect to cassandra
+  flag=True
+  while flag==True:
+    try:
+      cluster = Cluster([credentials[2]], port=9042, auth_provider=auth_provider)
+      session = cluster.connect()
+      flag = False
+    except cassandra.cluster.NoHostAvailable as er:
+      print(er)
+      print('This time cassandra did not answer, program will sleep for 40s and  try again')
+      time.sleep(40)
+
+  return session
+

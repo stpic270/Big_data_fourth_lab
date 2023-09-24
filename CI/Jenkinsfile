@@ -43,32 +43,26 @@ pipeline {
         stage('Run docker compose') {
             steps {
                 sh  '''
-                cd Big_data_fourth_lab && docker compose build
-                docker compose up -d --no-start
+                    cd Big_data_fourth_lab && docker compose build
+                    docker compose up -d 
+                    echo "Waiting 30 seconds for entrypoint script"
                     '''
+                sleep 30
                 }
             }
             
         stage('Start containers'){
             steps{
 
-                sh 'docker start big_data_fourth_lab-model-1'
-                
-                echo "Waiting 30 seconds for entrypoint script"
-                sleep 30
-                
                 sh  '''
-                    docker start big_data_fourth_lab-cassandra-1
                     docker exec -t big_data_fourth_lab-cassandra-1 bash -c "echo '\n' >> config/cassandra_ip.txt && ip -4 -o address >> config/cassandra_ip.txt"
-                    docker start big_data_fourth_lab-zookeeper-1
-                    docker start big_data_fourth_lab-kafka-1 && docker exec -t -d big_data_fourth_lab-kafka-1 bash -c "/bin/kafka-topics --create --topic cassandra-topic --bootstrap-server kafka:9092"
+                    docker exec -t -d big_data_fourth_lab-kafka-1 bash -c "/bin/kafka-topics --create --topic cassandra-topic --bootstrap-server kafka:9092"
                     '''
                 echo "Waiting 120 seconds for broker healthy running"
                 sleep 120
 
                 sh  ''' 
                     docker exec -t big_data_fourth_lab-model-1 bash -c "scripts/cassandra.sh"
-                    docker exec -t big_data_fourth_lab-kafka-1 bash -c "/bin/kafka-console-consumer --topic cassandra-topic --max-messages 12 --from-beginning --bootstrap-server kafka:9092"
                     '''
                 }
             }
@@ -78,6 +72,7 @@ pipeline {
                 dir("Big_data_fourth_lab"){
                     sh '''
                     docker compose logs -t --tail 20
+                    docker compose stop
                     '''
                 }
             }
@@ -87,7 +82,6 @@ pipeline {
             steps{
                 sh 'docker push stpic270/bd-fthl-d:latest'
                 sh 'docker push stpic270/bd-secl-cassandra:latest'
-                sh 'docker stop $(docker ps -a -q)'
             }
         }
         
